@@ -1,12 +1,12 @@
 import '../css/style.scss'
 import * as THREE from "three";
 import barba from '@barba/core';
-import { gsap } from "gsap";
+import { gsap, Circ } from "gsap";
 import vertexSource from "./shader/vertexShader.glsl";
 import fragmentSource from "./shader/fragmentShader.glsl";
 import { replaceHead } from './replace';
+import { radian } from './utils';
 
-import img from '../images/image.jpg';
 
 class Main {
   constructor() {
@@ -26,19 +26,31 @@ class Main {
     this.material = null;
     this.mesh = null;
 
+    this.group = new THREE.Group();
+
     this.uniforms = {
       uTime: {
         value: 0.0
       },
-      uTex: {
-        value: this.texture
+      // uTex: {
+      //   value: this.texture
+      // },
+      // uResolution: {
+      //   value: new THREE.Vector2(this.viewport.width, this.viewport.height)
+      // },
+      // uTexResolution: {
+      //   value: new THREE.Vector2(2048, 1024)
+      // },
+      //振幅
+      uPower: {
+        value: 0.0
       },
-      uResolution: {
-        value: new THREE.Vector2(this.viewport.width, this.viewport.height)
-      },
-      uTexResolution: {
-        value: new THREE.Vector2(2048, 1024)
-      },
+      //周波数
+      uFrequency: {
+        // value: 3.0
+        // value: new THREE.Vector2(4, 6)
+        value: new THREE.Vector3(4, 4, 4)
+      }
     };
 
     this.clock = new THREE.Clock();
@@ -70,14 +82,30 @@ class Main {
   }
 
   _addMesh() {
+    // //ジオメトリ
+    // this.geometry = new THREE.PlaneGeometry(this.viewport.width, this.viewport.height, 40, 40);
+
+    // //テクスチャ
+    // const loader = new THREE.TextureLoader();
+    // this.uniforms.uTex.value = loader.load(img);
+
+    // console.log(this.texture);
+
+    // //マテリアル
+    // this.material = new THREE.ShaderMaterial({
+    //   uniforms: this.uniforms,
+    //   vertexShader: vertexSource,
+    //   fragmentShader: fragmentSource,
+    //   side: THREE.DoubleSide
+    // });
+
+    // //メッシュ
+    // this.mesh = new THREE.Mesh(this.geometry, this.material);
+    // this.scene.add(this.mesh);
+
     //ジオメトリ
-    this.geometry = new THREE.PlaneGeometry(this.viewport.width, this.viewport.height, 40, 40);
+    this.geometry = new THREE.SphereGeometry(280, 80, 80);
 
-    //テクスチャ
-    const loader = new THREE.TextureLoader();
-    this.uniforms.uTex.value = loader.load(img);
-
-    console.log(this.texture);
 
     //マテリアル
     this.material = new THREE.ShaderMaterial({
@@ -89,10 +117,11 @@ class Main {
 
     //メッシュ
     this.mesh = new THREE.Mesh(this.geometry, this.material);
-    this.scene.add(this.mesh);
+    this.group.add(this.mesh);
   }
 
   init() {
+    this.scene.add(this.group);
     this._setRenderer();
     this._setCamera();
     this._setLight();
@@ -135,6 +164,44 @@ class Main {
   _addEvent() {
     window.addEventListener("resize", this._onResize.bind(this));
   }
+
+
+  anim01() {
+    const tl = gsap.timeline();
+    tl.to(this.group.rotation, {
+      y: radian(0),
+      duration: 0.8,
+      ease: Circ.easeInOut,
+    })
+    .to(this.uniforms.uPower, {
+      value: 0.0,
+      duration: 0.8,
+      ease: Circ.easeInOut,
+    }, '<')
+  }
+
+  anim02() {
+    // const tl = gsap.timeline({ repeat: -1 });
+    const tl = gsap.timeline();
+    tl.to(this.group.rotation, {
+      y: radian(360),
+      duration: 0.8,
+      ease: Circ.easeInOut,
+    })
+    .to(this.uniforms.uPower, {
+      value: 50.0,
+      duration: 0.8,
+      ease: Circ.easeInOut,
+    }, '<')
+  }
+
+  anim03() {
+    tl.to(this.group.rotation, {
+      y: radian(0),
+      duration: 0.8,
+      ease: Circ.easeInOut,
+    })
+  }
 }
 
 const main = new Main();
@@ -160,19 +227,19 @@ barba.init({
     {
       namespace: 'home',
       beforeEnter() {
-        
+        main.anim01();
       }
     },
     {
       namespace: 'page2',
       beforeEnter() {
-        
+        main.anim02();
       }
     },
     {
       namespace: 'page3',
       beforeEnter() {
-        
+        main.anim03();
       }
     }
   ]
