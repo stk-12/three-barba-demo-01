@@ -2,7 +2,6 @@ import '../css/style.scss'
 import * as THREE from "three";
 import barba from '@barba/core';
 import { gsap } from "gsap";
-// import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import vertexSource from "./shader/vertexShader.glsl";
 import fragmentSource from "./shader/fragmentShader.glsl";
 import { replaceHead } from './replace';
@@ -23,7 +22,6 @@ class Main {
     this.cameraFov = 45;
     this.cameraFovRadian = (this.cameraFov / 2) * (Math.PI / 180);
     this.cameraDistance = (this.viewport.height / 2) / Math.tan(this.cameraFovRadian);
-    // this.controls = null;
     this.geometry = null;
     this.material = null;
     this.mesh = null;
@@ -46,9 +44,6 @@ class Main {
     this.clock = new THREE.Clock();
 
     this.init();
-    // this._init();
-    // this._update();
-    // this._addEvent();
   }
 
   _setRenderer() {
@@ -61,24 +56,12 @@ class Main {
   }
 
   _setCamera() {
-    // this.camera = new THREE.PerspectiveCamera(45, this.viewport.width / this.viewport.height, 1, 100);
-    // this.camera.position.set(0, 0, 5);
-    // this.scene.add(this.camera);
-
     //ウインドウとWebGL座標を一致させる
-    // const fov = 45;
-    // const fovRadian = (fov / 2) * (Math.PI / 180); //視野角をラジアンに変換
-    // const distance = (this.viewport.height / 2) / Math.tan(fovRadian); //ウインドウぴったりのカメラ距離
     this.camera = new THREE.PerspectiveCamera(this.cameraFov, this.viewport.width / this.viewport.height, 1, this.cameraDistance * 2);
     this.camera.position.z = this.cameraDistance;
     this.camera.lookAt(new THREE.Vector3(0, 0, 0));
     this.scene.add(this.camera);
   }
-
-  // _setControlls() {
-  //   this.controls = new OrbitControls(this.camera, this.canvas);
-  //   this.controls.enableDamping = true;
-  // }
 
   _setLight() {
     const light = new THREE.DirectionalLight(0xffffff, 1.5);
@@ -112,7 +95,6 @@ class Main {
   init() {
     this._setRenderer();
     this._setCamera();
-    // this._setControlls();
     this._setLight();
     this._addMesh();
 
@@ -126,7 +108,6 @@ class Main {
 
     //レンダリング
     this.renderer.render(this.scene, this.camera);
-    // this.controls.update();
     requestAnimationFrame(this._update.bind(this));
   }
 
@@ -162,19 +143,39 @@ const main = new Main();
 
 barba.init({
   sync: true,
-  transitions: [{
-    name: 'default-transition',
-    leave(data) {
-      return gsap.to(data.current.container, {
-        opacity: 0
-      });
+  // transitions: [{
+  //   name: 'default-transition',
+  //   leave(data) {
+  //     return gsap.to(data.current.container, {
+  //       opacity: 0
+  //     });
+  //   },
+  //   enter(data) {
+  //     return gsap.from(data.next.container, {
+  //       opacity: 0
+  //     });
+  //   }
+  // }],
+  views: [
+    {
+      namespace: 'home',
+      beforeEnter() {
+        
+      }
     },
-    enter(data) {
-      return gsap.from(data.next.container, {
-        opacity: 0
-      });
+    {
+      namespace: 'page2',
+      beforeEnter() {
+        
+      }
+    },
+    {
+      namespace: 'page3',
+      beforeEnter() {
+        
+      }
     }
-  }]
+  ]
 });
 
 barba.hooks.beforeEnter((data) => {
